@@ -1,122 +1,126 @@
-<!--
-@component
-This is your page!
--->
 <script>
-  // Import all the news furniture components
   import ArticleHeader from '$lib/components/Article/ArticleHeader.svelte';
-  import ArticleBody from '$lib/components/Article/ArticleBody.svelte';
-  import Blockquote from '$lib/components/Article/Blockquote.svelte';
-  import Image from '$lib/components/Media/Image.svelte';
-  import RelatedLinks from '$lib/components/Article/RelatedLinks.svelte';
+  import Map from '$lib/components/Maps/Map.svelte';
+  import MapLayer from '$lib/components/Maps/MapLayer.svelte';
+  import Geocoder from '$lib/components/Maps/Geocoder.svelte';
+  import Legend from '$lib/components/Maps/Legend.svelte';
 
-  // Article metadata
-  let headline = 'Become a force for good. Join our next class.';
-  let byline = 'NYCity News Service';
-  let pubDate = '2026-01-31';
-
-  // Related stories
-  const relatedStories = [
-    {
-      headline:
-        "How America's top news organizations escape rigid publishing systems to design beautiful data-driven stories on deadline.",
-      href: 'https://palewi.re/docs/coding-the-news/',
-    },
-    {
-      headline:
-        'How to install, configure and use Visual Studio Code, GitHub and Copilot',
-      href: 'https://palewi.re/docs/coding-the-news/scripts/week-1/',
-    },
-    {
-      headline: 'How to publish a website with Node.JS and GitHub Actions',
-      href: 'https://palewi.re/docs/coding-the-news/scripts/week-2/',
-    },
-  ];
+  let { data } = $props();
+  let longitude = $state(-74.0);
+  let latitude = $state(40.7);
+  let zoom = $state(9.5);
 </script>
 
-<!-- This sets the page title in the browser tab -->
-<svelte:head>
-  <title>{headline} | NYCity News Service</title>
-  <meta
-    name="description"
-    content="At the Craig Newmark Graduate School of Journalism at the City University of New York, change is in our DNA. That comes of being born in 2006, as the digital revolution was transforming our profession in ways none of us could have imagined."
-  />
-</svelte:head>
-
-<!-- Your page content goes here -->
 <div class="container">
-  <!-- Article Header: Headline, byline, and publication date -->
-  <ArticleHeader {headline} {byline} {pubDate} />
-
-  <!-- Lead Image: Animated gif of students at the journalism school -->
-  <Image
-    src="/example-photo.gif"
-    alt="The Craig Newmark Graduate School of Journalism is at 219 West 40th Street in Midtown Manhattan."
-    caption="The Craig Newmark Graduate School of Journalism is at 219 West 40th Street in Midtown Manhattan."
-    credit="Craig Newmark Graduate School of Journalism"
+ <ArticleHeader
+    headline="Where to find the London plane, New York's most common tree"
+    byline="NYCity News Service"
+    pubDate="2026-04-20"
   />
 
-  <!-- Article Body: The main story text with proper typography -->
-  <ArticleBody>
-    <p class="dropcap">
-      At the Craig Newmark Graduate School of Journalism at the City University
-      of New York, change is in our DNA. That comes of being born in 2006, as
-      the digital revolution was transforming our profession in ways none of us
-      could have imagined.
-    </p>
+  <p>
+    Every ten years, thousands of volunteers canvass the city's street trees,
+    recording their species, trunk diameter, health, and exact location. In the
+    2015 survey, they found more than 600,000 trees and 133 different species.
+  </p>
 
-    <p>
-      We fashioned a school to teach the latest storytelling, entrepreneurial,
-      and technological skills alongside reporting, writing, and ethics. Beyond
-      that, we’ve crafted a culture that spurns complacency, that isn’t afraid
-      to pivot before the ground under us shifts.
-    </p>
+  <p>
+    One tree dominates the count: the London plane. It was the tree favored by
+    Robert Moses, the unelected "power broker" who controlled city parks for
+    decades in the mid 20th century. He made sure the hearty hybrid was planted
+    everywhere in New York, where it can be found in every borough and on nearly
+    every block.
+  </p>
 
-    <p>
-      Our mission is to serve the public interest – by training new journalists
-      from varied economic, racial, and cultural backgrounds who will bring
-      much-needed diversity to newsrooms, by helping mid-career journalists
-      retool their skills, and by partnering with other media organizations to
-      find new paths to excellence.
-    </p>
+  <p>
+    According to the 2015 census, there are more than 87,000 London plane
+    trees on New York's streets, 12% of the city's population of street trees.
+    Here's where the most London planes are found:
+  </p>
 
-    <Blockquote attribution="Craig Newmark Graduate School of Journalism">
-      <p>We invite you to be part of our world.</p>
-    </Blockquote>
 
-    <p>
-      Our low tuition rates, along with the added backing of private donors,
-      allow candidates for our master’s degrees in journalism and engagement
-      journalism to receive a world-class education at an affordable price. We
-      also offer a unique bilingual master’s in journalism for students fluent
-      in English and Spanish.
-    </p>
+ <Geocoder
+    label="Find your neighborhood"
+    placeholder="Enter an address in New York…"
+    onresult={(result) => {
+      longitude = result.lng;
+      latitude = result.lat;
+      zoom = 15;
+    }}
+  />
 
-    <p>
-      Our three media centers provide research, training, thought leadership,
-      industry meet-ups, and financial support for quality journalistic work.
-    </p>
+  <Map
+    {longitude}
+    {latitude}
+    {zoom}
+    height={600}
+    theme="positron"
+    credit="OpenFreeMap / OpenStreetMap contributors"
+  >
+    <MapLayer
+      id="nta-fill"
+      type="fill"
+      data={data.planetrees}
+      paint={{
+        'fill-color': [
+          'step',
+          ['get', 'total_planetree'],
+          '#eef2f9',
+          147,
+          '#c2cfe6',
+          269,
+          '#8098cc',
+          434,
+          '#3366b3',
+          697,
+          '#0033a1',
+        ],
+        'fill-opacity': 0.7,
+      }}
+           popup={(feature) => {
+    const p = feature.properties;
+    return `<strong>${p.ntaname}</strong><br/>${p.total_planetree} plane trees`;
+  }}
+    />
+    <MapLayer
+      id="nta-outline"
+      type="line"
+      data={data.planetrees}
+      paint={{
+        'line-color': '#0033a1',
+        'line-width': 0.5,
+      }}
+    />
+  </Map>
 
-    <p>
-      We also offer a robust professional education program through regular
-      evening and weekend workshops. And we support in-depth reporting projects
-      of professional journalists through fellowship grants.
-    </p>
-
-    <p>
-      Classes are led by accomplished full-time faculty and adjuncts, who tap
-      their networks to help students and graduates find internships, freelance
-      opportunities and — the ultimate prize — jobs.
-    </p>
-
-    <p>
-      At a time when our profession is reeling from financial pressures and lack
-      of trust, the Newmark Graduate School of Journalism is committed to
-      producing the next generation of skilled, ethically minded, and diverse
-      journalists.
-    </p>
-  </ArticleBody>
-
-  <!-- Related Stories: Links to other articles -->
-  <RelatedLinks title="Related Stories" links={relatedStories} />
+    <Legend
+    title="London plane trees"
+    mode="threshold"
+    items={[
+      {
+        color: '#eef2f9',
+        to: 146,
+      },
+      {
+        color: '#c2cfe6',
+        from: 147,
+        to: 268,
+      },
+      {
+        color: '#8098cc',
+        from: 269,
+        to: 433,
+      },
+      {
+        color: '#3366b3',
+        from: 434,
+        to: 696,
+      },
+      {
+        color: '#0033a1',
+        from: 697,
+      },
+    ]}
+  />
+  
 </div>
