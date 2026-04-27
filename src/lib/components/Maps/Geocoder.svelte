@@ -24,7 +24,10 @@ USAGE EXAMPLE:
     placeholder = 'Enter an address…',
     label = 'Search',
     onresult = () => {},
+    onclear = () => {},
     debounceMs = 300,
+    viewbox = null, // "west,north,east,south" bounding box to restrict results
+    bounded = false, // when true, only return results inside viewbox
   } = $props();
 
   let query = $state('');
@@ -61,6 +64,7 @@ USAGE EXAMPLE:
       results = [];
       isOpen = false;
       isLoading = false;
+      onclear();
       return;
     }
 
@@ -75,6 +79,7 @@ USAGE EXAMPLE:
         q: searchText.trim(),
         format: 'json',
         limit: '5',
+        ...(viewbox ? { viewbox, bounded: bounded ? '1' : '0' } : {}),
       });
 
       const response = await fetch(

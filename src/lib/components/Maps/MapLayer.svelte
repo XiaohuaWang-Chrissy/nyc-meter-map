@@ -42,6 +42,7 @@ USAGE EXAMPLE:
     data = { type: 'FeatureCollection', features: [] }, // GeoJSON data
     paint = {}, // MapLibre paint properties
     layout = {}, // MapLibre layout properties
+    minzoom = 0, // Minimum zoom level to show this layer (0–24)
     popup = null, // Optional function (feature) => htmlString
   } = $props();
 
@@ -112,6 +113,7 @@ USAGE EXAMPLE:
       source: validatedId,
       paint,
       layout,
+      minzoom,
     });
 
     if (popup) {

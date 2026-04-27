@@ -1,11 +1,10 @@
-import greatTrees from '$lib/data/great-trees.json';
-import planetrees from '$lib/data/planetrees-by-nta.json';
+export async function load({ fetch }) {
+  const res = await fetch('/parking-meters.geojson');
+  const parkingMeters = await res.json();
 
-export function load() {
   return {
     showHeader: true,
     showFooter: true,
-    greatTrees,
-    planetrees,
+    parkingMeters,
   };
 }
